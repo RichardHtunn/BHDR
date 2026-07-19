@@ -1,0 +1,10 @@
+torch
+torchvision
+Pillow
+pandas
+numpy
+matplotlib
+ruff
+pytest
+fastapi
+uvicorn
