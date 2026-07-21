@@ -1,44 +1,55 @@
-# Burmese Handwritten Digit Recognition (CNN) [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/RichardHtunn/BHDR/blob/main/startingAnOCR.ipynb)
+# Burmese Handwritten Digit Recognition (BHDR) 🇲🇲
 
-An end-to-end Computer Vision project focused on classifying handwritten Myanmar (Burmese) digits (၀-၉) using a custom PyTorch Convolutional Neural Network. 
+[![PyPI version](https://badge.fury.io/py/bhdr.svg)](https://badge.fury.io/py/bhdr)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This project explores the domain gap between academic datasets and real-world, unconstrained handwriting, utilizing data augmentation and custom preprocessing pipelines to improve model robustness.
+A lightweight, production-ready Deep Learning library that classifies handwritten Burmese digits (၀-၉) using a custom Convolutional Neural Network (CNN) built with PyTorch.
 
-## 📖 Overview
-While standard models achieve high accuracy (+99%) on clean validation sets like the BHDD (Burmese Handwritten Digit Dataset), they frequently fail in real-world applications due to variance in stroke thickness, aspect ratio distortion, and background noise. 
+This package bridges the domain gap between clean academic datasets and real-world, unconstrained handwriting by utilizing custom aspect-aware scaling and anti-squish mathematical padding.
 
-Inspired by the recent `myMNIST` benchmark research, this project implements a 2-layer CNN architecture and a robust image preprocessing pipeline to bridge that domain gap, allowing the model to accurately read thin, edge-to-edge, unpadded handwriting.
+## 📦 Installation
 
-## Model Architecture (V2)
-The network is a custom PyTorch CNN designed to extract both simple edge features and complex geometric loops (crucial for Burmese digits like ၅, ၆, and ၉).
-* **Layer 1:** `Conv2d` (1 -> 16 channels) + ReLU + Max Pooling
-* **Layer 2:** `Conv2d` (16 -> 32 channels) + ReLU + Max Pooling
-* **Classifier:** Fully Connected Linear Layers (1568 -> 128 -> 10)
-* **Optimizer:** Adam (`lr=0.001`)
-* **Loss:** Cross-Entropy
+You can install `bhdr` directly from PyPI using pip:
 
-## 🛠️ Engineering Challenges & Solutions
+```bash
+pip install bhdr
+```
 
-During real-world inference testing, the initial model failed due to three primary data pipeline issues. Here is how they were resolved:
+*Note: This package requires Python >= 3.10.*
 
-### 1. The Aspect Ratio Distortion
-* **Problem:** Raw images drawn on rectangular canvases were being forcibly squished into `28x28` squares via standard `transforms.Resize`, mathematically destroying the shape of tall digits like ၇ and ၂.
-* **Solution:** Implemented a custom `fit_and_pad` function using PIL. It scales the longest edge to 20 pixels while maintaining the exact aspect ratio, and then pastes it onto a pure black `28x28` canvas, perfectly mimicking the BHDD dataset padding.
+## 🚀 Quick Start Usage
 
-### 2. The Box Artifact (Thresholding)
-* **Problem:** Dark gray backgrounds from drawing apps were being pasted onto pure black tensors, creating a sharp square artifact. The CNN locked onto the square edge rather than the digit, resulting in total prediction failure.
-* **Solution:** Injected a thresholding binarization step `img.point(lambda p: 255 if p > 128 else 0)` before padding to crush gray backgrounds to pure `0` and boost strokes to `255`.
+`bhdr` is designed to be incredibly simple to use inside your own Python projects. Just import the `predict_digit` function and pass it an image path!
 
-### 3. Stroke Thickness & The Domain Gap
-* **Problem:** The model failed on incredibly thin handwriting because the `F.max_pool2d` layers compressed the thin strokes into disconnected dots. 
-* **Solution:** Rebuilt the `DataLoader` to include a Data Augmentation pipeline (`RandomRotation`, `RandomAffine` for scaling and translation) applied only to the training set. This forced the CNN to learn true geometric topology rather than memorizing thick-stroke pixel layouts.
+```python
+from bhdr import predict_digit
 
-## How to Run
-This project was developed entirely in Google Colab. 
-1. Click the `Open in Colab` badge at the top of the `.ipynb` file.
-2. Run the notebook sequentially to instantiate the network and the `fit_and_pad` pipeline.
-3. Use the final Inference cell to upload your own custom `.png` or `.jpg` drawings of Burmese digits to test the model.
+# Path to an image of a handwritten Burmese digit
+image_path = "test_images/my_digit.jpg"
 
-## Author
-**Shin Thant Tun** Computer Engineering Undergraduate  
-King Mongkut's Institute of Technology Ladkrabang (KMITL)
+# Run the inference engine
+predicted_class = predict_digit(image_path)
+
+print(f"The model predicted the digit is: {predicted_class}")
+```
+
+## 🧠 Model Architecture (V2)
+
+The core model is a highly optimized 2-layer Convolutional Neural Network.
+* **Input:** `1x28x28` Grayscale Tensor
+* **Layer 1:** Conv2D (16 filters) -> ReLU -> MaxPool2D
+* **Layer 2:** Conv2D (32 filters) -> ReLU -> MaxPool2D
+* **Classifier:** Fully Connected Linear Layer (10 output classes for digits ၀-၉)
+
+## 🛠️ Intelligent Preprocessing Pipeline
+
+Standard computer vision models often fail on real-world Burmese handwriting due to extreme variance in stroke thickness and aspect ratio distortion (especially for tall/thin digits like ၇ and ၂). 
+
+This library features a custom inference pipeline that:
+1. Inverts colors to a standard black background / white stroke format.
+2. Crops the image exactly to the digit's bounding box to remove dead space.
+3. Dynamically pads the shortest side to create a perfect square *without* stretching or distorting the original digit's aspect ratio.
+4. Resizes to the 28x28 tensor expected by the CNN.
+
+---
+**Author:** Shin Thant Tun

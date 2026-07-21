@@ -6,8 +6,8 @@ import torchvision.transforms as transforms
 import pickle
 import os
 
-from src.data import BurmeseDigitDataset
-from src.model import BurmeseDigitCNN_V2
+from bhdr.data import BurmeseDigitDataset
+from bhdr.model import BurmeseDigitCNN_V2
 
 def train() -> None:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
