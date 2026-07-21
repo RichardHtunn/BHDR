@@ -3,7 +3,7 @@ import torchvision.transforms as transforms
 from PIL import Image, ImageOps
 import os
 
-from model import BurmeseDigitCNN_V2
+from src.model import BurmeseDigitCNN_V2
 
 def fit_and_pad(img: Image.Image, target_size: int = 28) -> Image.Image:
     """
