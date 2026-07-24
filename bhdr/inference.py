@@ -60,6 +60,6 @@ if __name__ == "__main__":
     
     if os.path.exists(test_image_path):
         prediction = predict_digit(test_image_path)
-        print(f"🤖 The V2 model predicts this digit is: {prediction}")
+        print(f"The V2 model predicts this digit is: {prediction}")
     else:
         print(f"Please place an image named '{test_image_path}' in the main folder to test.")
